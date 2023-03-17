@@ -1,59 +1,87 @@
 #define _GNU_SOURCE
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <stddef.h>
+#include <sys/cdefs.h>
+// For mmap()
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-static __always_inline char* itoa(unsigned short value, char* result) {
-	int i = 0;
-	while (value) {
-		result[9 - i++] = (value % 10) + '0';
-		value /= 10;
-	}
-	result[10] = '\0';
-	return result+(10-i);
+static __always_inline char *itoa(unsigned short value, char *result) {
+  int i = 0;
+  while (value) {
+    result[9 - i++] = (value % 10) + '0';
+    value /= 10;
+  }
+  result[10] = '\0';
+  return result + (10 - i);
 }
 
+struct shell {
+  char *name;
+  int count;
+};
+
+struct shell shells[128];
+
 int main() {
-  struct shell {
-    char name[20];
-	int count; 
-  };
 
-  void *heap =
-      calloc(1,128*(sizeof(struct shell)+1)); // combine allocations for both into one fat one
-  struct shell *restrict buf = heap; 
-  char *buffer = heap + (sizeof(struct shell) * 128);
+  // FILE *fp = fopen("passwd", "r");
+  int fd = open("passwd", O_RDONLY);
+  struct stat s;
+  fstat(fd, &s);
+  size_t fileSize = s.st_size;
+  char *buffer = mmap(0, fileSize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
 
-  FILE *fp = fopen("passwd", "r");
-  size_t bufSize = 128;
-  size_t lineSize;
+  // size_t lineSize = 0;
+  // size_t bufSize = 1024;
 
   size_t ts = 0;
 
-  while ((lineSize = getline(&buffer, &bufSize, fp)) != (size_t)-1) {
-	const char* const colon = memrchr(buffer, ':', lineSize-6) + 1;			// TODO: Replace memrchr with precalculated positions once I figure out the math
-    const size_t length = buffer + lineSize - colon - 1;
-	// new id generater by @crumbtoo 
-	const size_t id = (buffer[lineSize - 4] ^ length + buffer[lineSize - 5]) & 0x3f; // hash(colon);
-    buf[id].count++;
-    if (0 == *buf[id].name) {
-      memcpy(buf[id].name, colon, length);
-      buf[id].name[length] = '\t';
-	  buf[id].name[length+1] = '\0';
-      ts++;
+  while (1) {
+    char *newLine = memchr(buffer, '\n', 100);
+    ptrdiff_t totalLineSize = newLine - buffer;
+	if (totalLineSize <= 0)
+		break;
+	char *colon = memrchr(buffer, ':', totalLineSize - 6) + 1;
+	buffer = newLine+1;
+    
+	ptrdiff_t shellSize = newLine - colon;
+   
+    // new id generater by @crumbtoo
+    int id = (colon[shellSize - 3] ^ shellSize + colon[shellSize-4]) & 0xabcdff; // 0x63 had collissions... so I changed the constant
+	// printf("%s %d %d %c %c\n", strndup(colon, shellSize), shellSize, id, colon[shellSize-3], colon[1]);
+	// positions once I figure out the math
+    shells[id].count++;
+    if (0 == shells[id].name) {
+      	shells[id].name = colon;
+		colon[shellSize] = '\t';
+		colon[shellSize+1] = '\0';
+		ts++;
     }
   }
 
   for (int i = 0; i < 100; i++) {
-    struct shell s = buf[i];
-	  if (s.count > 0) {
-		  fputs(s.name, stdout);
-		  puts(itoa(s.count, buf));
+    struct shell s = shells[i];
+    if (s.count > 0) {
+      // fputs_unlocked(s.name, stdout);
+      // fputs_unlocked(itoa(s.count, shells), stdout);
+      // putchar_unlocked('\n');
+      fputs(s.name, stdout);
+      puts(itoa(s.count, (void*)shells));
       if (!--ts)
         break;
     }
   }
 
-  free(heap);
-  fclose(fp);
+  // free(shells);
+  munmap(buffer, s.st_size);
+  close(fd);
+  // sbrk(-4096);
+  // fclose(fp);
 }
