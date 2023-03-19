@@ -164,9 +164,9 @@ fi
 if [ -n "$(which ghc 2>/dev/null)" ]; then
 	HSPROG=getshells-hs
 	HSPROG_HYPER="./getshells-hs -n Haskell"
-	ghc -O getshells.hs -o ${HSPROG} -outputdir=/tmp
+	ghc -O3 -threaded getshells.hs -o ${HSPROG} -fforce-recomp -outputdir=/tmp
 else
-	echo "C Compiler not found."
+	echo "ghc (Haskell compiler) not found."
 fi
 
 LIST="${LUA} ${LUAJIT} ${CPROG} ${CPPPROG} ${RSPROG} ${M_RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${RBPROG} ${CRPROG} ${M_CRPROG} ${PLPROG} ${AWK} ${LISPPROG} ${PSHELL} ${HSPROG}"
