@@ -75,21 +75,21 @@ int main() {
   }
 
 // Output
+ setvbuf(stdout, NULL, _IOFBF, BUFSIZ);
   for (int i = 0; i < 100; i++) {
     struct shell s = shells[i];
     if (s.count > 0) {
       fputs_unlocked(s.name, stdout);
+      fputs_unlocked(itoa(s.count, (void*)shells), stdout);
       #ifdef FUNC_TEST
-      fputs_unlocked(itoa(s.count, (void*)shells), stdout);
       printf("\t%s%d\n\n",s.name,s.count);
-      #else
-      fputs_unlocked(itoa(s.count, (void*)shells), stdout);
       #endif
       if (!--totalShells)
         break;
     }
   }
 
+  fflush(stdout);
   munmap(buffer, s.st_size);
   close(fd);
 }
