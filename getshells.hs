@@ -1,30 +1,31 @@
+{-# LANGUAGE OverloadedStrings #-}
 import System.IO
 import Text.Printf
 import Data.List (sort, group)
+import Data.Map hiding (drop)
+import qualified Data.Text as T
 
+{-# INLINE (|>) #-}
 infixl 0 |>
 (|>) :: a -> (a -> b) -> b
 x |> f = f x
 
-lastColumn :: String -> String
-lastColumn s
-    | ':' `elem` s  = lastColumn $ drop 1 $ dropWhile (/=':') s
-    | otherwise     = s
+lastColumn :: T.Text -> T.Text
+lastColumn = last . T.splitOn ":"
 
-prettyPrint :: [(String, Int)] -> String
-prettyPrint [] = ""
-prettyPrint [(k,v)] = printf "%s : %v\n" k v
-prettyPrint (x@(k,v):xs) = prettyPrint [x] ++ prettyPrint xs
+prettyPrint :: T.Text -> Int -> String
+prettyPrint k v = printf "%v : %v\n" k v
 
 main :: IO ()
 main = do
-    entries <- readFile "passwd"
+    entries <- T.pack <$> readFile "passwd"
 
-    let counts = lines entries
-            |> fmap lastColumn
-            |> sort
-            |> group
-            |> fmap (\g -> (head g, length g))
+    let shells = T.lines entries
+              |> fmap lastColumn
+              |> fmap (\x -> (x,1 :: Int))
+              |> fromListWith (+)
 
-    putStr $ prettyPrint counts
+    -- format each key-value pair, wrap it with putStr, and finally execute each print action
+    mapWithKey (\ k v -> putStr $ prettyPrint k v) shells
+        |> sequence_
 
