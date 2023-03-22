@@ -1,10 +1,12 @@
 #!/bin/sh
 
+if ! [ "$SHELL" = "bash" ]; then
 # Check for standalone time
 TIME="$(which time 2>/dev/null)"
 if [ -z "$TIME" ]; then
 	echo "Failed to find standalone time executable"
 	exit
+fi
 fi
 
 # Check for C Compiler
@@ -34,7 +36,7 @@ fi
 if [ -n "${CC}" ]; then
 	CPROG=getshells-c
 	CPROG_HYPER="./getshells-c -n C"
-	${CC} -march=native -O3 getshells.c -o ${CPROG}
+	${CC} -march=native -Ofast -mtune=native -pthread getshells.c -o ${CPROG}
 else
 	echo "C Compiler not found."
 fi
