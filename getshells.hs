@@ -18,6 +18,7 @@ prettyPrint k v = printf "%v : %v\n" k v
 
 main :: IO ()
 main = do
+    -- we're using the strict version of Data.Text, so this uses a *tonne* of memory
     entries <- TIO.readFile "passwd"
 
     let shells = T.lines entries
