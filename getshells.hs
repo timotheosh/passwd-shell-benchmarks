@@ -27,6 +27,6 @@ main = do
               |> fromListWith (+)
 
     -- format each key-value pair, wrap it with putStr, and finally execute each print action
-    mapWithKey (\ k v -> putStr $ prettyPrint k v) shells
+    mapWithKey (\k v -> putStr $ prettyPrint k v) shells
         |> sequence_
 
