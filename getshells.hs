@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 import System.IO
 import Text.Printf
-import Data.List (sort, group)
 import Data.Map hiding (drop)
 import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 
 {-# INLINE (|>) #-}
 infixl 0 |>
@@ -18,7 +18,7 @@ prettyPrint k v = printf "%v : %v\n" k v
 
 main :: IO ()
 main = do
-    entries <- T.pack <$> readFile "passwd"
+    entries <- TIO.readFile "passwd"
 
     let shells = T.lines entries
               |> fmap lastColumn
