@@ -11,7 +11,7 @@ infixl 0 |>
 x |> f = f x
 
 lastColumn :: T.Text -> T.Text
-lastColumn = last . T.splitOn ":"
+lastColumn = snd . T.breakOnEnd ":"
 
 prettyPrint :: T.Text -> Int -> String
 prettyPrint k v = printf "%v : %v\n" k v
