@@ -1,17 +1,20 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-my %pwhash = ();
+my %pwhash;
 
-open(PW, "passwd") || die "trying";
-while (chomp(my $line = <PW>)) {
-    $line =~ /.*:(\S+)$/;
-    $pwhash{$1}++;
+open(my $fh, '<', 'passwd') or die "Cannot open passwd: $!";
+
+while (<$fh>) {
+    chomp;
+    my $shell = (split /:/)[-1];
+    $pwhash{$shell}++ if $shell;
 }
+close($fh);
 
-foreach (sort keys (%pwhash)) {
-	next if ( $pwhash{$_} eq "" );
-        printf("%-18s:\t%d\n", $_, $pwhash{$_});
+foreach my $shell (sort keys %pwhash) {
+    printf("%-18s:\t%d\n", $shell, $pwhash{$shell});
 }
 

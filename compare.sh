@@ -4,6 +4,7 @@
 TIME="$(which time 2>/dev/null)"
 if [ -z "$TIME" ]; then
 	echo "Failed to find standalone time executable"
+	echo "Please install the 'time' package"
 	exit
 fi
 
@@ -154,6 +155,16 @@ fi
 LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
 
 for i in ${LIST} ; do
+if [ -n "$(which raku 2>/dev/null)" ]; then
+	RKPROG=getshells.raku
+else
+	echo "Raku not found."
+fi
+
+
+LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL}"
+
+for i in ${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ; do
     echo "################################################"
     echo "$i"
     $TIME -f "%E\nMax memory usage: %MK" "./${i}"
