@@ -1,4 +1,4 @@
-#!elixir
+#!/usr/bin/env elixir
 
 "passwd"
 |> File.stream!()

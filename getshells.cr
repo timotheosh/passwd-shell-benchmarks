@@ -1,4 +1,4 @@
-#!crystal
+#!/usr/bin/env -S crystal run --release
 
 shellcnt = Hash(String, Int32).new(0)
 

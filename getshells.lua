@@ -1,4 +1,4 @@
-#!lua
+#!/usr/bin/env lua
 local m = {}
 for line in io.lines("passwd") do
 	local _, e = string.find(line, ".*:")

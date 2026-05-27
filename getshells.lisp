@@ -1,4 +1,4 @@
-#!sbcl --script
+#!/usr/bin/env -S sbcl --script
 
 (let ((h (make-hash-table :test #'equal)))
   (with-open-file (s "passwd")

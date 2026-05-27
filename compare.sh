@@ -1,9 +1,7 @@
 #!/bin/sh
 
 # Check for standalone time
-if [ -z "$TIME" ]; then
-	TIME="$(which time 2>/dev/null)"
-fi
+TIME="$(which time 2>/dev/null)"
 if [ -z "$TIME" ]; then
 	echo "Failed to find standalone time executable"
 	exit

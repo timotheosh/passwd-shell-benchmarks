@@ -1,4 +1,4 @@
-#!clojure -M
+#!/usr/bin/env -S clojure -M
 
 (defn split-passwd [f]
   (when-let [r (clojure.java.io/reader f)]
