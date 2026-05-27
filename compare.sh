@@ -113,12 +113,6 @@ else
 	echo "Crystal-lang not found."
 fi
 
-if [ -n "$(which elixir 2>/dev/null)" ]; then
-    EXSPROG=getshells.exs
-else
-    echo "Elixir not found."
-fi
-
 # Check for Lua
 if [ -n "$(which lua 2>/dev/null)" ]; then
 	LUA=getshells.lua
@@ -139,6 +133,12 @@ if [ -n "$(which ghc 2>/dev/null)" ]; then
 	ghc -o ${HSPROG} getshells.hs -no-keep-hi-files -no-keep-o-files
 else
 	echo "Haskell compiler not found."
+fi
+
+if [ -n "$(which elixir 2>/dev/null)" ]; then
+    EXSPROG=getshells.exs
+else
+    echo "Elixir not found."
 fi
 
 LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG}"
