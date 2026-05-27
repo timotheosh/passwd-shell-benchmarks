@@ -158,7 +158,7 @@ else
 	echo "Raku not found."
 fi
 
-LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
 
 for i in ${LIST} ; do
     echo "################################################"
