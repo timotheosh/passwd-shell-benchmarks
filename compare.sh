@@ -136,12 +136,18 @@ else
 fi
 
 if [ -n "$(which elixir 2>/dev/null)" ]; then
-    EXSPROG=getshells.exs
+	EXSPROG=getshells.exs
 else
-    echo "Elixir not found."
+	echo "Elixir not found."
 fi
 
-LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG}"
+if [ -n "$(which clojure 2>/dev/null)" ]; then
+	CLJPROG=getshells.clj
+else
+	echo "Clojure not found."
+fi
+
+LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG}"
 
 for i in ${LIST} ; do
     echo "################################################"
