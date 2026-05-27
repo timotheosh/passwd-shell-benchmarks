@@ -1,7 +1,9 @@
 #!/bin/sh
 
 # Check for standalone time
-TIME="$(which time 2>/dev/null)"
+if [ -z "$TIME" ]; then
+	TIME="$(which time 2>/dev/null)"
+fi
 if [ -z "$TIME" ]; then
 	echo "Failed to find standalone time executable"
 	exit
@@ -111,6 +113,12 @@ else
 	echo "Crystal-lang not found."
 fi
 
+if [ -n "$(which elixir 2>/dev/null)" ]; then
+    EXSPROG=getshells.exs
+else
+    echo "Elixir not found."
+fi
+
 # Check for Lua
 if [ -n "$(which lua 2>/dev/null)" ]; then
 	LUA=getshells.lua
@@ -133,9 +141,9 @@ else
 	echo "Haskell compiler not found."
 fi
 
-LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL}"
+LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG}"
 
-for i in ${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL}; do
+for i in ${LIST} ; do
     echo "################################################"
     echo "$i"
     $TIME -f "%E\nMax memory usage: %MK" "./${i}"

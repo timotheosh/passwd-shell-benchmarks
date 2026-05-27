@@ -1,4 +1,4 @@
-#!/usr/bin/env crystal
+#!crystal
 
 shellcnt = Hash(String, Int32).new(0)
 

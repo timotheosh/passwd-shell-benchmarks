@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!python3
 
 from collections import defaultdict
 shellcnt = defaultdict(int)

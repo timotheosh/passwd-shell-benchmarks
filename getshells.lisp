@@ -1,4 +1,4 @@
-#!/usr/bin/env -S sbcl --script
+#!sbcl --script
 (defun inc (val)
   (declare
    (optimize (speed 3) (debug 0) (safety 0)))

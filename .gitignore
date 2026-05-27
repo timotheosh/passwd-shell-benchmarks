@@ -1,5 +1,6 @@
 *.o
 *.txt
+*.json
 .ccls-cache
 a.out
 getshells

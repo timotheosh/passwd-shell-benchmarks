@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!ruby
 
 shellcnt = Hash.new(0) # use Hash.new to create a new hash with a default value of 0 for any missing keys
 

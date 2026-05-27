@@ -1,4 +1,4 @@
-#!/usr/bin/env luajit
+#!luajit
 local m = {}
 for line in io.lines("passwd") do
 	local _, e = string.find(line, ".*:")
