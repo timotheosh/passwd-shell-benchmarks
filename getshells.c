@@ -1,70 +1,58 @@
 #include <stdio.h>
 #include <string.h>
-// demo program to read a unix password file and show 
+
+// demo program to read a unix password file and show
 // how many instances of each login shell are found
-// unlike perl/python, c doesn't have associative arrays, so....
+// optimized 20260527 - jjs
 
-int main()
-{
-   FILE *fp1;
-   char line[256], shell[32];
-   char shells[16][32];
-   int shellcnt[16];
-   int i, j, k=0, numshells=0, len, mflag;
+#define MAX_SHELLS 64
+#define SHELL_LEN 64
 
-   // initialize shell and shellcount arrays
+int main(void) {
+    FILE *fp1 = fopen("passwd", "r");
+    if (!fp1) {
+        perror("Error opening file");
+        return 1;
+    }
 
-   for( i=0; i<16; i++) {
-	for (j = 0; j < 32; j++) {
-	    shells[i][j] = '\0';
-	}
-   }
+    char line[256];
+    char shells[MAX_SHELLS][SHELL_LEN] = {0};
+    int shellcnt[MAX_SHELLS] = {0};
+    int numshells = 0;
 
-   for( i=0; i<16; i++) {
-	shellcnt[i] = 0;
-   }
+    while (fgets(line, sizeof(line), fp1)) {
+        // Strip trailing newline character immediately
+        line[strcspn(line, "\n")] = '\0';
 
-   // read each passwd line and get the shell
-   fp1= fopen ("passwd", "r");
-   while (fgets(line, sizeof(line), fp1)) {
-	len = strlen(line);
-	for (j = len; j >= 0; j--) {
-	   if (line[j] == ':') {
-	     strncpy(shell, &line[++j], 32);
-	     shell[strlen(shell) -1] = '\0';
-	     break;
-	   }
-	}
+        // Find the last colon directly
+        char *shell_ptr = strrchr(line, ':');
+        if (!shell_ptr) continue; 
+        shell_ptr++; // Move past the ':'
 
-	// if there are no shells, add immediately to first slot
-	if (numshells == 0) {
-	   strcpy(shells[0], shell);
-	   shellcnt[0] = 1;
-	   numshells = 1;
-	} else {
-	   // check to see if shell already in array 
-	   mflag = 0;
-	   for(k = 0; k < numshells; k++) {
-		if (strcmp(shells[k], shell) == 0) {
-		   mflag = 1;
-		   shellcnt[k] += 1;
-	      } 
-	}
+        // Search if shell already exists in our table
+        int found = 0;
+        for (int k = 0; k < numshells; k++) {
+            if (strcmp(shells[k], shell_ptr) == 0) {
+                shellcnt[k]++;
+                found = 1;
+                break; // Stop searching once found
+            }
+        }
 
-	// no match, add new shell entry 
-	if (mflag == 0) {
-	   strcpy(shells[numshells], shell);
-	   shellcnt[numshells] +=1;
-	   numshells++;
-	}
- 
-	}
+        // If it's a new shell, add it safely
+        if (!found && numshells < MAX_SHELLS) {
+            strncpy(shells[numshells], shell_ptr, SHELL_LEN - 1);
+            shellcnt[numshells] = 1;
+            numshells++;
+        }
     }
     fclose(fp1);
 
-
-    // display shell tally
-    for ( i = 0; i < numshells; i++ ) {
-	printf("%-18s:\t%d\n", shells[i], shellcnt[i]);
+    // Display shell tally
+    for (int i = 0; i < numshells; i++) {
+        printf("%-18s:\t%d\n", shells[i], shellcnt[i]);
     }
+
+    return 0;
 }
+
