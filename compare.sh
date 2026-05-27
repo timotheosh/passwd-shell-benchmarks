@@ -148,7 +148,7 @@ fi
 if [ -n "$(which guile 2>/dev/null)" ]; then
 	SCMPROG=getshells.scm
 else
-	echo "Guile Scheme not found
+	echo "Guile Scheme not found"
 fi
 
 LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
