@@ -6,5 +6,5 @@ getshells
 getshells-*
 getshells.hi
 getshells.o
-**/target/**
-**/release/**
+target
+release
