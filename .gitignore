@@ -1,10 +1,11 @@
 *.o
 *.txt
+*.json
 .ccls-cache
 a.out
 getshells
 getshells-*
 getshells.hi
 getshells.o
-**/target/**
-**/release/**
+target
+release

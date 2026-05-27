@@ -114,14 +114,14 @@ fi
 
 # Check for Lua
 if [ -n "$(which lua 2>/dev/null)" ]; then
-	LUA=getshells.lua
+	LUAPROG=getshells.lua
 else
 	echo "Lua not found."
 fi
 
 # Check for LuaJIT
 if [ -n "$(which luajit 2>/dev/null)" ]; then
-	LUA=getshells.luajit
+	LUAJITPROG=getshells.luajit
 else
 	echo "LuaJIT not found."
 fi
@@ -134,6 +134,27 @@ else
 	echo "Haskell compiler not found."
 fi
 
+if [ -n "$(which elixir 2>/dev/null)" ]; then
+	EXSPROG=getshells.exs
+else
+	echo "Elixir not found."
+fi
+
+if [ -n "$(which clojure 2>/dev/null)" ]; then
+	CLJPROG=getshells.clj
+else
+	echo "Clojure not found."
+fi
+
+if [ -n "$(which guile 2>/dev/null)" ]; then
+	SCMPROG=getshells.scm
+else
+	echo "Guile Scheme not found"
+fi
+
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
+
+for i in ${LIST} ; do
 if [ -n "$(which raku 2>/dev/null)" ]; then
 	RKPROG=getshells.raku
 else
