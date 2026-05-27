@@ -152,19 +152,15 @@ else
 	echo "Guile Scheme not found"
 fi
 
-LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
-
-for i in ${LIST} ; do
 if [ -n "$(which raku 2>/dev/null)" ]; then
 	RKPROG=getshells.raku
 else
 	echo "Raku not found."
 fi
 
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
 
-LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL}"
-
-for i in ${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ; do
+for i in ${LIST} ; do
     echo "################################################"
     echo "$i"
     $TIME -f "%E\nMax memory usage: %MK" "./${i}"
