@@ -113,14 +113,14 @@ fi
 
 # Check for Lua
 if [ -n "$(which lua 2>/dev/null)" ]; then
-	LUA=getshells.lua
+	LUAPROG=getshells.lua
 else
 	echo "Lua not found."
 fi
 
 # Check for LuaJIT
 if [ -n "$(which luajit 2>/dev/null)" ]; then
-	LUA=getshells.luajit
+	LUAJITPROG=getshells.luajit
 else
 	echo "LuaJIT not found."
 fi
@@ -151,7 +151,7 @@ else
 	echo "Guile Scheme not found"
 fi
 
-LIST="${LUA} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
 
 for i in ${LIST} ; do
     echo "################################################"
