@@ -11,6 +11,8 @@
   (name "" :type simple-string)
   (count 0 :type fixnum))
 
+;; Compare the current shell candidate against an existing shell name
+;; without allocating a temporary string.
 (defun shell-bytes= (tmp len str)
   (declare (type octet-buffer tmp)
            (fixnum len)
@@ -20,6 +22,8 @@
              always (= (aref tmp i)
                        (char-code (schar str i))))))
 
+;; Materialize a shell name once. Shells repeat heavily in passwd files,
+;; so we only allocate when we discover a new one.
 (defun shell-string (tmp len)
   (declare (type octet-buffer tmp)
            (fixnum len))
@@ -30,6 +34,9 @@
                    (code-char (aref tmp i))))
     s))
 
+;; Most systems only have a handful of distinct shells. We bucket by
+;; length first and then do a short linear search rather than building
+;; a more complicated hash structure.
 (defun count-shell (tmp len table)
   (declare (type octet-buffer tmp)
            (fixnum len)
@@ -44,6 +51,8 @@
                             :count 1)
           (gethash len table))))
 
+;; Scan the passwd file as raw bytes. We start capturing after the sixth
+;; colon because the shell field is the seventh field in passwd format.
 (defun main ()
   (let ((table (make-hash-table :test #'eql))
         (buf (make-array +buffer-size+
