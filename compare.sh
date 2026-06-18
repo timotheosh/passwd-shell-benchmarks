@@ -81,7 +81,11 @@ else
 fi
 
 if [ -n "$(which sbcl 2>/dev/null)" ]; then
-	LISPPROG=getshells.lisp
+	LISPPROG=getshells-lisp
+	sbcl --dynamic-space-size 1024 \
+		--load getshells.lisp \
+		--eval '(sb-ext:save-lisp-and-die "getshells-lisp" :toplevel #'\''main :executable t :compression nil)' \
+		--quit
 else
 	echo "SBCL (Lisp) not found."
 fi
