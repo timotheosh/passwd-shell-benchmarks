@@ -1,0 +1,179 @@
+    Finished `release` profile [optimized] target(s) in 0.03s
+This is SBCL 2.5.2.debian, an implementation of ANSI Common Lisp.
+More information about SBCL is available at <http://www.sbcl.org/>.
+
+SBCL is free software, provided as is, with absolutely no warranty.
+It is mostly in the public domain; some portions are provided under
+BSD-style licenses.  See the CREDITS and COPYING files in the
+distribution for more information.
+[undoing binding stack and other enclosing state... done]
+[performing final GC... done]
+[defragmenting immobile space... (inst,code,sym)=730+19105+22962... done]
+[saving current Lisp image into getshells-lisp:
+writing 65536 bytes from the linkage space at 0xb7ffc00000
+writing 3120 bytes from the static space at 0x50000000
+writing 12091392 bytes from the dynamic space at 0x1000000000
+writing 7455936 bytes from the read-only space at 0xfff8e0000
+writing 1208320 bytes from the fixedobj space at 0x52100000
+writing 11333632 bytes from the text space at 0xb800000000
+done]
+Julia not found.
+[1 of 2] Compiling Main             ( getshells.hs, getshells.o )
+[2 of 2] Linking getshells-hs [Objects changed]
+################################################
+getshells.lua
+/bin/bash: 44804
+/bin/false: 91608
+/bin/sync: 22402
+/usr/sbin/nologin: 867678
+0:00.48
+Max memory usage: 2508K
+################################################
+getshells.luajit
+/bin/sync: 22402
+/usr/sbin/nologin: 867678
+/bin/false: 91608
+/bin/bash: 44804
+0:00.31
+Max memory usage: 2384K
+################################################
+getshells-c
+/bin/bash         :	44804
+/usr/sbin/nologin :	867678
+/bin/sync         :	22402
+/bin/false        :	91608
+0:00.05
+Max memory usage: 1424K
+################################################
+getshells-rust
+/usr/sbin/nologin: 867678
+/bin/bash: 44804
+/bin/false: 91608
+/bin/sync: 22402
+0:00.15
+Max memory usage: 2008K
+################################################
+getshells-go
+/bin/false:	91608
+/bin/bash:	44804
+/usr/sbin/nologin:	867678
+/bin/sync:	22402
+0:00.22
+Max memory usage: 7512K
+################################################
+getshells.js
+/bin/bash	:	44804
+/usr/sbin/nologin	:	867678
+/bin/sync	:	22402
+/bin/false	:	91608
+0:00.54
+Max memory usage: 71696K
+################################################
+getshells.py
+/bin/bash          44804
+/bin/false         91608
+/bin/sync          22402
+/usr/sbin/nologin  867678
+0:00.44
+Max memory usage: 123048K
+################################################
+getshells.pl
+/bin/bash         :	44804
+/bin/false        :	91608
+/bin/sync         :	22402
+/usr/sbin/nologin :	867678
+0:00.61
+Max memory usage: 6064K
+################################################
+getshells-lisp
+/bin/sync : 22402
+/bin/bash : 44804
+/usr/sbin/nologin : 867678
+/bin/false : 91608
+0:00.17
+Max memory usage: 17988K
+################################################
+getshells.rb
+/bin/bash           :       44804
+/usr/sbin/nologin   :       867678
+/bin/sync           :       22402
+/bin/false          :       91608
+0:01.63
+Max memory usage: 19404K
+################################################
+getshells.awk
+/usr/sbin/nologin :	867678
+/bin/false        :	91608
+/bin/bash         :	44804
+/bin/sync         :	22402
+0:01.43
+Max memory usage: 9488K
+################################################
+getshells-cr
+/bin/bash           : 44804
+/usr/sbin/nologin   : 867678
+/bin/sync           : 22402
+/bin/false          : 91608
+0:00.26
+Max memory usage: 2876K
+################################################
+getshells.php
+/bin/bash: 44804
+/usr/sbin/nologin: 867678
+/bin/sync: 22402
+/bin/false: 91608
+ 
+0:00.18
+Max memory usage: 18132K
+################################################
+getshells-hs
+/bin/bash: 44804
+/bin/false: 91608
+/bin/sync: 22402
+/usr/sbin/nologin: 867678
+0:03.67
+Max memory usage: 695352K
+################################################
+getshells.raku
+/bin/bash         :	44804
+/bin/false        :	91608
+/bin/sync         :	22402
+/usr/sbin/nologin :	867678
+0:07.63
+Max memory usage: 131868K
+################################################
+getshells.ps1
+
+[32;1mName                          [0m[32;1m Value[0m
+[32;1m----                          [0m [32;1m-----[0m
+/usr/sbin/nologin              867678
+/bin/false                     91608
+/bin/bash                      44804
+/bin/sync                      22402
+
+0:26.60
+Max memory usage: 1809168K
+################################################
+getshells.exs
+/bin/bash           : 44804
+/bin/false          : 91608
+/bin/sync           : 22402
+/usr/sbin/nologin   : 867678
+0:01.89
+Max memory usage: 328412K
+################################################
+getshells.clj
+/bin/bash : 44804
+/usr/sbin/nologin : 867678
+/bin/sync : 22402
+/bin/false : 91608
+0:02.70
+Max memory usage: 919320K
+################################################
+getshells.scm
+/bin/false : 91608
+/bin/sync : 22402
+/usr/sbin/nologin : 867678
+/bin/bash : 44804
+0:18.33
+Max memory usage: 10888K

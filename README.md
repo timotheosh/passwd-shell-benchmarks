@@ -14,11 +14,14 @@ To date, the following languages are represented:
  *  go
  *  julia
  *  lisp
+ *  lua
  *  ms powershell
  *  node.js
  *  perl
  *  php
+ *  prolog
  *  python
+ *  raku
  *  ruby
  *  rust (thanks `timotheosh`!)
  *  crystal-lang (thanks `izder456`!)
