@@ -1,4 +1,4 @@
-(declaim (optimize (speed 3) (safety 1) (debug 0)
+(declaim (optimize (speed 3) (safety 0) (debug 0)
                    (compilation-speed 0)))
 
 (defconstant +buffer-size+ #.(* 1024 1024))
