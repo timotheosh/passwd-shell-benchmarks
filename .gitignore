@@ -10,3 +10,4 @@ getshells.o
 target
 release
 push-to-master.sh
+target/

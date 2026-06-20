@@ -11,7 +11,10 @@ A script is included, which runs each of the programs and times the results for 
 To date, the following languages are represented:
 
  *  c
+ *  Clojure (via Babashka)
+ *  crystal-lang (thanks `izder456`!)
  *  go
+ *  Guile Scheme
  *  julia
  *  lisp
  *  lua
@@ -24,7 +27,6 @@ To date, the following languages are represented:
  *  raku
  *  ruby
  *  rust (thanks `timotheosh`!)
- *  crystal-lang (thanks `izder456`!)
  *  shell/awk
 
 If you're an expert in a language not listed here, we welcome your contribution!
