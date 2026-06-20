@@ -11,6 +11,7 @@ A script is included, which runs each of the programs and times the results for 
 To date, the following languages are represented:
 
  *  C
+ *  Clojure (via Babashka)
  *  Crystal-lang (thanks `izder456`!)
  *  Go
  *  Guile Scheme
