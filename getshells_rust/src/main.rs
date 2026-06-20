@@ -1,45 +1,29 @@
 use std::{
-    fs::File,
-    io::{self, stdout, BufRead, BufReader, Write},
+    fs,
+    io::{stdout, Write},
 };
 
-#[cfg(target_feature = "avx")]
 use ahash::AHashMap;
-#[cfg(not(target_feature = "avx"))]
-use std::collections::HashMap;
 
 fn main() {
-    const FILE: &str = "passwd";
-    const CHUNK: usize = 256 * 1024;
+    let data = fs::read("passwd").expect("failed to read passwd");
+    let mut hs: AHashMap<&[u8], u32> = AHashMap::with_capacity(512);
 
-    let file = BufReader::with_capacity(CHUNK, File::open(FILE).expect("failed to read {FILE}"));
-    #[cfg(target_feature = "avx")]
-    let mut hs = AHashMap::with_capacity(512);
-    #[cfg(not(target_feature = "avx"))]
-    let mut hs = HashMap::with_capacity(512);
-    file.split(b'\n')
-        .try_for_each(|line| -> io::Result<()> {
-            let mut line = line?;
-            let colon_idx = line
-                .iter()
-                .enumerate()
-                .rev()
-                .find(|(_, &b)| b == b':')
-                .map(|(idx, _)| idx)
-                .unwrap_or_default();
-            line.drain(0..=colon_idx);
-            if line.last() == Some(&b'\r') {
-                line.pop();
-            }
-            line.shrink_to_fit();
-            hs.entry(line).and_modify(|x| *x += 1u32).or_insert(1);
-            Ok(())
-        })
-        .unwrap();
+    for line in data.split(|&b| b == b'\n') {
+        let line = line.strip_suffix(b"\r").unwrap_or(line);
+        if line.is_empty() {
+            continue;
+        }
+        let shell = match memchr::memrchr(b':', line) {
+            Some(pos) => &line[pos + 1..],
+            None => line,
+        };
+        *hs.entry(shell).or_insert(0) += 1;
+    }
+
     let mut stdout = stdout().lock();
-
-    hs.into_iter().for_each(|(shell, count)| {
-        let _ = stdout.write_all(&shell);
+    for (shell, count) in &hs {
+        let _ = stdout.write_all(shell);
         let _ = writeln!(&mut stdout, ": {count}");
-    })
+    }
 }
