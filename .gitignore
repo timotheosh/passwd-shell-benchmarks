@@ -1,6 +1,7 @@
 *.o
 *.txt
 *.json
+*.scm.go
 .ccls-cache
 a.out
 getshells
