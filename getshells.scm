@@ -1,4 +1,4 @@
-#!/usr/bin/env -S guile -s
+#!/usr/bin/guile -s
 !#
 
 (let ((h '()))
