@@ -9,5 +9,6 @@ getshells.hi
 getshells.o
 target
 release
+results*
 push-to-master.sh
 target/

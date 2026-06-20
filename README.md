@@ -28,6 +28,24 @@ To date, the following languages are represented:
  *  ruby
  *  rust (thanks `timotheosh`!)
  *  shell/awk
+ *  C
+ *  Clojure (via Babashka)
+ *  Crystal-lang (thanks `izder456`!)
+ *  Go
+ *  Guile Scheme
+ *  Julia
+ *  Lisp
+ *  Lua
+ *  Ms powershell
+ *  Node.js
+ *  Perl
+ *  Php
+ *  Prolog
+ *  Python
+ *  Raku
+ *  Ruby
+ *  Rust (thanks `timotheosh`!)
+ *  Shell/awk
 
 If you're an expert in a language not listed here, we welcome your contribution!
 
