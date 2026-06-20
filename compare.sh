@@ -76,6 +76,7 @@ fi
 
 if [ -n "$(which perl 2>/dev/null)" ]; then
 	PLPROG=getshells.pl
+	PLONEPROG=getshells-one-liner.pl
 else
 	echo "Perl not found."
 fi
@@ -168,7 +169,7 @@ else
 	echo "Raku not found."
 fi
 
-LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${PLONEPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
 
 for i in ${LIST} ; do
     echo "################################################"
