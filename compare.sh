@@ -153,7 +153,13 @@ fi
 if [ -n "$(which guile 2>/dev/null)" ]; then
 	SCMPROG=getshells.scm
 else
-	echo "Guile Scheme not found"
+	echo "Guile Scheme not found."
+fi
+
+if [ -n "$(which guile 2>/dev/null)" ]; then
+	GUILEPROG=getshells-guile.scm
+else
+	echo "Guile Scheme not found."
 fi
 
 if [ -n "$(which raku 2>/dev/null)" ]; then
@@ -162,7 +168,7 @@ else
 	echo "Raku not found."
 fi
 
-LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG}"
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
 
 for i in ${LIST} ; do
     echo "################################################"

@@ -24,6 +24,7 @@ To date, the following languages are represented:
  *  Php
  *  Prolog
  *  Python
+ *  Pure Scheme
  *  Raku
  *  Ruby
  *  Rust (thanks `timotheosh`!)
