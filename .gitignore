@@ -7,7 +7,7 @@ getshells
 getshells-*
 getshells.hi
 getshells.o
-target
+*target*
 release
 results*
 push-to-master.sh
