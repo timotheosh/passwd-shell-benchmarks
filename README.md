@@ -10,24 +10,6 @@ A script is included, which runs each of the programs and times the results for 
 
 To date, the following languages are represented:
 
- *  c
- *  Clojure (via Babashka)
- *  crystal-lang (thanks `izder456`!)
- *  go
- *  Guile Scheme
- *  julia
- *  lisp
- *  lua
- *  ms powershell
- *  node.js
- *  perl
- *  php
- *  prolog
- *  python
- *  raku
- *  ruby
- *  rust (thanks `timotheosh`!)
- *  shell/awk
  *  C
  *  Clojure (via Babashka)
  *  Crystal-lang (thanks `izder456`!)
