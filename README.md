@@ -22,7 +22,6 @@ To date, the following languages are represented:
  *  Node.js
  *  Perl
  *  Php
- *  Prolog
  *  Python
  *  Pure Scheme
  *  Raku
