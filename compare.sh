@@ -1,22 +1,13 @@
 #!/bin/sh
 
-# Check for standalone time
-TIME="$(which time 2>/dev/null)"
-if [ -z "$TIME" ]; then
-	echo "Failed to find standalone time executable"
-	echo "Please install the 'time' package"
-	exit
-fi
-
 # Check for C Compiler
-if [ -n "${CC}" ]; then
-	# CC=${CC} # why are you assigning $CC to itsself
-	: # Do nothing, since $CC was defined
-elif [ -n "$(which clang 2>/dev/null)" ]; then
+if [ -n "$CC" ]; then
+	:
+elif command -v clang >/dev/null 2>&1; then
 	CC=clang
-elif [ -n "$(which gcc 2>/dev/null)" ]; then
+elif command -v gcc >/dev/null 2>&1; then
 	CC=gcc
-elif [ -n "$(which cc 2>/dev/null)" ]; then
+elif command -v cc >/dev/null 2>&1; then
 	CC=cc
 fi
 
@@ -28,7 +19,7 @@ else
 fi
 
 # Check for rust compiler
-if [ -n "$(which cargo 2>/dev/null)" ]; then
+if command -v cargo >/dev/null 2>&1; then
 	RSPROG="getshells-rust"
 	cd "getshells_rust" || echo "getshells_rust folder not found"
 	cargo build --release --all-features
@@ -39,7 +30,7 @@ else
 fi
 
 # Check for golang compiler
-if [ -n "$(which go 2>/dev/null)" ]; then # literal string will always return true value
+if command -v go >/dev/null 2>&1; then
 	GOPROG=getshells-go
 	go build getshells.go
 	mv getshells ${GOPROG}
@@ -48,39 +39,43 @@ else
 fi
 
 # Check for Powershell
-if [ -n "$(which pwsh 2>/dev/null)" ]; then
+if command -v pwsh >/dev/null 2>&1; then
 	PSHELL=getshells.ps1
 else
 	echo "Powershell not found."
 fi
 
 # Check for PHP
-if [ -n "$(which php 2>/dev/null)" ]; then
+if command -v php >/dev/null 2>&1; then
 	PHP=getshells.php
 else
 	echo "PHP not found."
 fi
 
 # Check for awk
-if [ -n "$(which awk 2>/dev/null)" ]; then
+if command -v awk >/dev/null 2>&1; then
 	AWK=getshells.awk
 else
 	echo "Awk not found."
 fi
 
-if [ -n "$(which python3 2>/dev/null)" ]; then
+# Check for python
+if command -v awk >/dev/null 2>&1; then
 	PYPROG=getshells.py
 else
 	echo "Python3 not found."
 fi
 
-if [ -n "$(which perl 2>/dev/null)" ]; then
+# Check for perl
+if command -v perl >/dev/null 2>&1; then
 	PLPROG=getshells.pl
+	PLONEPROG=getshells-one-liner.pl
 else
 	echo "Perl not found."
 fi
 
-if [ -n "$(which sbcl 2>/dev/null)" ]; then
+# Check for SBCL (Lisp)
+if command -v sbcl >/dev/null 2>&1; then
 	LISPPROG=getshells-lisp
 	sbcl --dynamic-space-size 1024 \
 		--load getshells.lisp \
@@ -90,25 +85,29 @@ else
 	echo "SBCL (Lisp) not found."
 fi
 
-if [ -n "$(which node 2>/dev/null)" ]; then
+# Check for NodeJS
+if command -v node >/dev/null 2>&1; then
 	NODEPROG=getshells.js
 else
 	echo "NodeJS not found."
 fi
 
-if [ -n "$(which julia 2>/dev/null)" ]; then
+# Check for julia
+if command -v julia >/dev/null 2>&1; then
 	JLPROG=getshells.jl
 else
 	echo "Julia not found."
 fi
 
-if [ -n "$(which ruby 2>/dev/null)" ]; then
+# Check for ruby
+if command -v ruby >/dev/null 2>&1; then
 	RBPROG=getshells.rb
 else
 	echo "Ruby not found."
 fi
 
-if [ -n "$(which crystal 2>/dev/null)" ]; then
+# Check for crystal
+if command -v crystal >/dev/null 2>&1; then
 	CRPROG=getshells-cr
 	crystal build --release getshells.cr
 	mv getshells ./${CRPROG}
@@ -117,61 +116,77 @@ else
 fi
 
 # Check for Lua
-if [ -n "$(which lua 2>/dev/null)" ]; then
+if command -v lua >/dev/null 2>&1; then
 	LUAPROG=getshells.lua
 else
 	echo "Lua not found."
 fi
 
 # Check for LuaJIT
-if [ -n "$(which luajit 2>/dev/null)" ]; then
+if command -v luajit >/dev/null 2>&1; then
 	LUAJITPROG=getshells.luajit
 else
 	echo "LuaJIT not found."
 fi
 
 # Check for Haskell compiler
-if [ -n "$(which ghc 2>/dev/null)" ]; then
+if command -v ghc >/dev/null 2>&1; then
 	HSPROG=getshells-hs
 	ghc -o ${HSPROG} getshells.hs -no-keep-hi-files -no-keep-o-files
 else
 	echo "Haskell compiler not found."
 fi
 
-if [ -n "$(which elixir 2>/dev/null)" ]; then
+# Check for Elixir
+if command -v elixir >/dev/null 2>&1; then
 	EXSPROG=getshells.exs
 else
 	echo "Elixir not found."
 fi
 
-if [ -n "$(which clojure 2>/dev/null)" ]; then
+# Check for babashka (Clojure)
+if command -v bb >/dev/null 2>&1; then
 	CLJPROG=getshells.clj
 else
-	echo "Clojure not found."
+	echo "Babashka (Clojure) not found."
 fi
 
-if [ -n "$(which guile 2>/dev/null)" ]; then
+# Check for guile (scheme)
+if command -v guile >/dev/null 2>&1; then
 	SCMPROG=getshells.scm
-else
-	echo "Guile Scheme not found."
-fi
-
-if [ -n "$(which guile 2>/dev/null)" ]; then
 	GUILEPROG=getshells-guile.scm
 else
-	echo "Guile Scheme not found."
+	echo "Guile (Scheme) not found."
 fi
 
-if [ -n "$(which raku 2>/dev/null)" ]; then
+# Check for raku
+if command -v raku >/dev/null 2>&1; then
 	RKPROG=getshells.raku
 else
 	echo "Raku not found."
 fi
 
-LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
+# wrapper function for various time implementations so we can have memory readouts
+# check bsd time first, then portable gnu time, gnu time, and finally fallback to posix time
+run_benchmark() {
+	if /usr/bin/time -l true >/dev/null 2>&1; then
+		/usr/bin/time -l "$@"
+	elif command -v gtime >/dev/null 2>&1; then
+		gtime -f '%E\nMax RSS: %MK' "$@"
+	elif /usr/bin/time -f '%E\nMax RSS: %MK' true >/dev/null 2>&1; then
+		/usr/bin/time -f '%E\nMax RSS: %MK' "$@"
+	else
+		/usr/bin/time "$@"
+	fi
+}
 
-for i in ${LIST} ; do
-    echo "################################################"
-    echo "$i"
-    $TIME -f "%E\nMax memory usage: %MK" "./${i}"
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${PLONEPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
+
+for i in $LIST
+do
+	printf '%s\n' \
+		'################################################' \
+		"$i"
+
+	run_benchmark "./$i"
 done
