@@ -144,11 +144,14 @@ else
 	echo "Elixir not found."
 fi
 
-# Check for babashka (Clojure)
-if command -v bb >/dev/null 2>&1; then
+# Check for Clojure and/or babashka 
+if command -v clojure >/dev/null 2>&1; then
 	CLJPROG=getshells.clj
+fi
+if command -v bb >/dev/null 2>&1; then
+	CLJPROG=getshells-bb.clj
 else
-	echo "Babashka (Clojure) not found."
+	echo "Neither Babashka nor Clojure were found."
 fi
 
 # Check for guile (scheme)

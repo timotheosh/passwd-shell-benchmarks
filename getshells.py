@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
+import sys
+from collections import Counter
 
-from collections import defaultdict
-shellcnt = defaultdict(int)
+with open('passwd') as f:
+    data = f.read()
 
-with open('passwd', "r") as pw:
-    for line in pw.readlines():
-        shell = line[line.rfind(':')+1:].strip()
-        shellcnt[shell] += 1
+shells = Counter(line.rpartition(':')[2] for line in data.splitlines() if line)
 
-shells = sorted(shellcnt.keys())
-
-for i in shells:
-    print("{0:18} {1:5}".format(i, shellcnt[i]))
+sys.stdout.write(''.join('%-18s %5d\n' % (s, shells[s]) for s in sorted(shells)))
