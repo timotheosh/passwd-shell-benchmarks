@@ -48,50 +48,36 @@
   (let ((table (make-hash-table))
         (buf   (make-bytevector buffer-size))
         (shell (make-bytevector max-shell-len)))
-
     (call-with-input-file
         "passwd"
-
       (lambda (port)
-
         (let ((colon-count 0)
               (shell-len 0)
               (capturing #f))
-
           (let chunk-loop ()
-
             (let ((n (get-bytevector-n! port
                                         buf
                                         0
                                         buffer-size)))
-
               (unless (eof-object? n)
-
                 (let byte-loop ((i 0))
-
                   (when (< i n)
-
                     (let ((b (bytevector-u8-ref buf i)))
-
                       (cond
-
                        ;; :
                        ((= b 58)
                         (set! colon-count (+ colon-count 1))
-
                         (when (= colon-count 6)
                           (set! capturing #t)
                           (set! shell-len 0)))
 
                        ;; newline
                        ((= b 10)
-
                         (when (and capturing
                                    (> shell-len 0))
                           (count-shell shell
                                        shell-len
                                        table))
-
                         (set! colon-count 0)
                         (set! shell-len 0)
                         (set! capturing #f))
@@ -102,34 +88,24 @@
                          shell
                          shell-len
                          b)
-
                         (set! shell-len
                               (+ shell-len 1))))
-
                       (byte-loop (+ i 1)))))
-
                 (chunk-loop)))))))
 
     ;; output
     (hash-for-each
      (lambda (_ bucket)
-
        (for-each
         (lambda (entry)
-
           (display
            (utf8->string
             (vector-ref entry 0)))
-
           (display " : ")
-
           (display
            (vector-ref entry 1))
-
           (newline))
-
         bucket))
-
      table)))
 
 (main)
