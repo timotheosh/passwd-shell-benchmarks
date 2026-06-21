@@ -1,4 +1,4 @@
-#!/usr/bin/env bb
+#!/usr/bin/env clojure
 
 (defn get-shell [line]
   (let [idx (clojure.string/last-index-of line ":")]
