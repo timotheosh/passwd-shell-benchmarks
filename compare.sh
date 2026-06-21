@@ -159,6 +159,14 @@ else
 	echo "Guile (Scheme) not found."
 fi
 
+# Check for Gambit Scheme
+if command -v gsc >/dev/null 2>&1; then
+	GAMBITPROG=getshells-gambit
+	gsc -exe getshells-gambit.scm
+else
+	echo "Gambit Scheme (gsc) not found."
+fi
+
 # Check for raku
 if command -v raku >/dev/null 2>&1; then
 	RKPROG=getshells.raku
@@ -180,7 +188,7 @@ run_benchmark() {
 	fi
 }
 
-LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${PLONEPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${PLONEPROG} ${JLPROG} ${LISPPROG} ${GAMBITPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
 
 for i in $LIST
 do
