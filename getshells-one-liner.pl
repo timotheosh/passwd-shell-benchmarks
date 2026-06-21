@@ -1,1 +1,1 @@
-perl -F: -ane 'chomp $F[-1]; $h{$F[-1]}++ if $F[-1] ; END { printf "%-18s:\t%d\n", $_, $h{$_} for sort keys %h }' passwd
+perl -ne '$i=rindex($_,":");$h{substr($_,$i+1,-1)}++if$i>=0;END{printf"%-18s:\t%d\n",$_,$h{$_}for sort keys%h}' passwd

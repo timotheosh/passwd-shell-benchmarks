@@ -1,20 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
-
-my %pwhash;
-
+my %h;
 open(my $fh, '<', 'passwd') or die "Cannot open passwd: $!";
-
 while (<$fh>) {
-    chomp;
-    my $shell = (split /:/)[-1];
-    $pwhash{$shell}++ if $shell;
+    my $i = rindex($_, ':');
+    $h{substr($_, $i + 1, -1)}++ if $i >= 0;
 }
-close($fh);
-
-foreach my $shell (sort keys %pwhash) {
-    printf("%-18s:\t%d\n", $shell, $pwhash{$shell});
-}
+close $fh;
+printf("%-18s:\t%d\n", $_, $h{$_}) for sort keys %h;
 
