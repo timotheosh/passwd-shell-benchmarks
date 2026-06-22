@@ -38,6 +38,13 @@ else
 	echo "Golang compiler not found."
 fi
 
+if command -v gfortran-12 >/dev/null 2>&1; then
+	FPROG=getshells-fortran
+	 gfortran-12 -o $FPROG getshells.f90
+else
+	echo "Fortran compiler not found."
+fi
+
 # Check for Powershell
 if command -v pwsh >/dev/null 2>&1; then
 	PSHELL=getshells.ps1
@@ -147,11 +154,13 @@ fi
 # Check for Clojure and/or babashka 
 if command -v clojure >/dev/null 2>&1; then
 	CLJPROG=getshells.clj
+else
+	echo "Clojure not found."
 fi
 if command -v bb >/dev/null 2>&1; then
 	CLJPROG=getshells-bb.clj
 else
-	echo "Neither Babashka nor Clojure were found."
+	echo "Babashka not found."
 fi
 
 # Check for guile (scheme)
@@ -183,7 +192,7 @@ run_benchmark() {
 	fi
 }
 
-LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${PLONEPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG}"
+LIST="${LUAPROG} ${LUAJITPROG} ${CPROG} ${RSPROG} ${GOPROG} ${NODEPROG} ${PYPROG} ${PLPROG} ${PLONEPROG} ${JLPROG} ${LISPPROG} ${RBPROG} ${AWK} ${CRPROG} ${PHP} ${HSPROG} ${RKPROG} ${PSHELL} ${EXSPROG} ${CLJPROG} ${SCMPROG} ${GUILEPROG} ${FPROG}"
 
 for i in $LIST
 do

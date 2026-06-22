@@ -8,8 +8,9 @@ getshells
 getshells-*
 getshells.hi
 getshells.o
-*target*
+out*
+push-to-master.sh
 release
 results*
-push-to-master.sh
+*target*
 target/
