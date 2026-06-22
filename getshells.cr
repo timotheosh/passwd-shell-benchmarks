@@ -3,7 +3,7 @@
 BUFFER_SIZE = 1024 * 1024
 MAX_SHELL_LEN = 512
 
-struct ShellEntry
+class ShellEntry
   property name : Bytes
   property count : Int32
 
