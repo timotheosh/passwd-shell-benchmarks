@@ -4,6 +4,9 @@ set -eu
 
 RUNS=${RUNS:-10}
 OUTFILE=${OUTFILE:-results.csv}
+TMPFILE=$(mktemp)
+
+trap 'rm -f "$TMPFILE"' EXIT
 
 detect_time()
 {
@@ -25,15 +28,19 @@ run_once_bsd()
 	/usr/bin/time -l "$1" >/dev/null 2>"$tmp"
 
 	elapsed=$(
-		sed -n \
-			's/^\([0-9.][0-9.]*\) real$/\1/p' \
-			"$tmp"
+		awk '
+		$2 == "real" {
+			print $1
+			exit
+		}' "$tmp"
 	)
 
 	rss=$(
-		sed -n \
-			's/^\([0-9][0-9]*\)[[:space:]].*maximum resident set size$/\1/p' \
-			"$tmp"
+		awk '
+		/maximum resident set size/ {
+			print $1
+			exit
+		}' "$tmp"
 	)
 
 	rm -f "$tmp"
@@ -94,18 +101,10 @@ run_once_posix()
 run_once()
 {
 	case "$TIME_IMPL" in
-		bsd)
-			run_once_bsd "$1"
-			;;
-		gtime)
-			run_once_gtime "$1"
-			;;
-		gnu)
-			run_once_gnu "$1"
-			;;
-		*)
-			run_once_posix "$1"
-			;;
+		bsd) run_once_bsd "$1" ;;
+		gtime) run_once_gtime "$1" ;;
+		gnu) run_once_gnu "$1" ;;
+		*) run_once_posix "$1" ;;
 	esac
 }
 
@@ -127,9 +126,6 @@ average_program()
 		count++
 	}
 	END {
-		if (count == 0)
-			exit 1
-
 		printf "%.6f,%.0f\n",
 			time_sum / count,
 			rss_sum / count
@@ -139,10 +135,10 @@ average_program()
 detect_time
 
 printf '%s\n' \
-	'language,avg_seconds,avg_rss_kb' \
+	'Language,Time,Mem usage,LOC' \
 	> "$OUTFILE"
 
-while IFS='|' read -r name prog
+while IFS='|' read -r name prog source
 do
 	[ -x "$prog" ] || continue
 
@@ -150,11 +146,35 @@ do
 
 	stats=$(average_program "$prog")
 
-	printf '%s,%s\n' \
+	time_sec=$(printf '%s\n' "$stats" | cut -d, -f1)
+	rss=$(printf '%s\n' "$stats" | cut -d, -f2)
+	loc=$(awk 'END { print NR }' "$source")
+
+	printf '%s,%s,%s,%s\n' \
 		"$name" \
-		"$stats" \
-		>> "$OUTFILE"
+		"$time_sec" \
+		"$rss" \
+		"$loc" \
+		>> "$TMPFILE"
 
 done < benchmark.list
+
+sort -t, -k2,2n "$TMPFILE" |
+while IFS=, read -r lang secs rss loc
+do
+	time_fmt=$(
+		awk -v s="$secs" '
+		BEGIN {
+			m=int(s/60)
+			printf "%02d:%05.2f", m, s-(m*60)
+		}'
+	)
+
+	printf '%s,%s,%sK,%s\n' \
+		"$lang" \
+		"$time_fmt" \
+		"$rss" \
+		"$loc"
+done >> "$OUTFILE"
 
 printf 'Results written to %s\n' "$OUTFILE" >&2
