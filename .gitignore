@@ -2,25 +2,18 @@
 /bin/
 /logs/
 /release/
-
 # benchmark outputs
 results*
 benchmark.list
-
 # compiler artifacts
 *.o
 *.hi
 *.scm.go
 a.out
-
 # temporary/generated files
 *.txt
 *.json
-<<<<<<< HEAD
 out*
-
-# rust
-=======
 *.scm.go
 .ccls-cache
 a.out
@@ -36,9 +29,5 @@ pull-from-master.sh
 release
 results*
 *target*
->>>>>>> 34f8bb4 (updated .gitignore)
-target/
-*target*
-
 # editor tooling
 .ccls-cache
