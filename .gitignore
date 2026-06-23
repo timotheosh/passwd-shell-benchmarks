@@ -2,25 +2,32 @@
 /bin/
 /logs/
 /release/
-
 # benchmark outputs
 results*
 benchmark.list
-
 # compiler artifacts
 *.o
 *.hi
 *.scm.go
 a.out
-
 # temporary/generated files
 *.txt
 *.json
 out*
-
-# rust
-target/
+*.scm.go
+.ccls-cache
+a.out
+*~
+commit.txt
+getshells
+getshells-*
+getshells.hi
+getshells.o
+out*
+push-to-master.sh
+pull-from-master.sh
+release
+results*
 *target*
-
 # editor tooling
 .ccls-cache

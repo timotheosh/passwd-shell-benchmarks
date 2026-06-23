@@ -140,7 +140,7 @@ printf '%s\n' \
 
 exec 3< benchmark.list
 
-while IFS='|' read -r name prog source <&1
+while IFS='|' read -r name prog source <&3
 do
 	[ -x "$prog" ] || continue
 
