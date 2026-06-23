@@ -138,7 +138,9 @@ printf '%s\n' \
 	'Language,Time,Mem usage,LOC' \
 	> "$OUTFILE"
 
-while IFS='|' read -r name prog source
+exec 3< benchmark.list
+
+while IFS='|' read -r name prog source <&1
 do
 	[ -x "$prog" ] || continue
 
@@ -157,7 +159,7 @@ do
 		"$loc" \
 		>> "$TMPFILE"
 
-done < benchmark.list
+done
 
 sort -t, -k2,2n "$TMPFILE" |
 while IFS=, read -r lang secs rss loc
