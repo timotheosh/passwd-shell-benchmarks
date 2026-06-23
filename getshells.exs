@@ -4,7 +4,7 @@ defmodule GetShells do
   @bufsize 1024 * 1024
 
   def run do
-    {:ok, fd} = :file.open('passwd', [:read, :raw, :binary])
+    {:ok, fd} = :file.open("passwd", [:read, :raw, :binary])
 
     counts =
       scan(fd, %{}, 0, false, [])
