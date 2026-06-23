@@ -17,6 +17,7 @@ To date, the following languages are represented:
  *  Fortran
  *  Go
  *  Guile Scheme
+ *  Haskell
  *  Julia
  *  Lisp
  *  Lua
