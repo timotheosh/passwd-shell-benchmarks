@@ -13,6 +13,7 @@ To date, the following languages are represented:
  *  C
  *  Clojure (via Babashka)
  *  Crystal-lang (thanks `izder456`!)
+ *  Elixir
  *  Fortran
  *  Go
  *  Guile Scheme
