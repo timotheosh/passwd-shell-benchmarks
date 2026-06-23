@@ -1,16 +1,26 @@
+# build outputs
+/bin/
+/logs/
+/release/
+
+# benchmark outputs
+results*
+benchmark.list
+
+# compiler artifacts
 *.o
+*.hi
+*.scm.go
+a.out
+
+# temporary/generated files
 *.txt
 *.json
-*.scm.go
-.ccls-cache
-a.out
-getshells
-getshells-*
-getshells.hi
-getshells.o
 out*
-push-to-master.sh
-release
-results*
-*target*
+
+# rust
 target/
+*target*
+
+# editor tooling
+.ccls-cache
