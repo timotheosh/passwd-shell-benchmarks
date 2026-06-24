@@ -12,7 +12,7 @@
       (unless (eof-object? line)
 
         (let* ((idx   (string-rindex line #\:))
-               (shell (substring/shared line (+ idx 1))))
+               (shell (substring line (+ idx 1))))
 
           (hash-set! shells
                      shell
