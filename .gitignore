@@ -24,8 +24,8 @@ getshells-*
 getshells.hi
 getshells.o
 out*
-push-to-master.sh
-pull-from-master.sh
+push-to-master
+pull-from-master
 release
 results*
 *target*
