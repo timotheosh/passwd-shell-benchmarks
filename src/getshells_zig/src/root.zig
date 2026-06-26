@@ -1,55 +1,87 @@
 // getshells - core logic
 // Reads a unix passwd file and tallies login shells
+// Uses std.posix / std.os.linux for cross-version compatibility
+// (tested on Zig 0.15.x and 0.17-dev)
 const std = @import("std");
-const Io = std.Io;
+const posix = std.posix;
+const linux = std.os.linux;
 
 const MAX_SHELLS = 64;
 const SHELL_LEN = 64;
 
-pub fn run(io: Io) !void {
-    const cwd = Io.Dir.cwd();
-    const file = try cwd.openFile(io, "passwd", .{});
-    defer file.close(io);
+const ShellName = [SHELL_LEN]u8;
 
-    var read_buf: [4096]u8 = undefined;
-    var file_reader: Io.File.Reader = .init(file, io, &read_buf);
-    const reader = &file_reader.interface;
+fn processLine(
+    line: []const u8,
+    shells: *[MAX_SHELLS]ShellName,
+    shell_lengths: *[MAX_SHELLS]usize,
+    shellcnt: *[MAX_SHELLS]i32,
+    numshells: *usize,
+) void {
+    const last_colon = std.mem.lastIndexOfScalar(u8, line, ':') orelse return;
+    const shell = line[last_colon + 1 ..];
+    if (shell.len == 0 or shell.len >= SHELL_LEN) return;
 
-    const ShellName = [SHELL_LEN]u8;
+    for (0..numshells.*) |k| {
+        if (std.mem.eql(u8, shells[k][0..shell_lengths[k]], shell)) {
+            shellcnt[k] += 1;
+            return;
+        }
+    }
+
+    if (numshells.* < MAX_SHELLS) {
+        @memcpy(shells[numshells.*][0..shell.len], shell);
+        shell_lengths[numshells.*] = shell.len;
+        shellcnt[numshells.*] = 1;
+        numshells.* += 1;
+    }
+}
+
+pub fn run() !void {
+    const fd = try posix.openat(posix.AT.FDCWD, "passwd", .{ .ACCMODE = .RDONLY }, 0);
+    defer _ = linux.close(fd);
+
     var shells = std.mem.zeroes([MAX_SHELLS]ShellName);
     var shell_lengths = std.mem.zeroes([MAX_SHELLS]usize);
     var shellcnt = std.mem.zeroes([MAX_SHELLS]i32);
     var numshells: usize = 0;
 
-    // takeDelimiter consumes the delimiter and returns null at EOF
-    while (reader.takeDelimiter('\n') catch null) |line| {
-        const last_colon = std.mem.lastIndexOfScalar(u8, line, ':') orelse continue;
-        const shell = line[last_colon + 1 ..];
-        if (shell.len == 0 or shell.len >= SHELL_LEN) continue;
+    var read_buf: [8192]u8 = undefined;
+    var line_buf: [256]u8 = undefined;
+    var line_len: usize = 0;
 
-        var found = false;
-        for (0..numshells) |k| {
-            if (std.mem.eql(u8, shells[k][0..shell_lengths[k]], shell)) {
-                shellcnt[k] += 1;
-                found = true;
-                break;
+    while (true) {
+        const n = try posix.read(fd, &read_buf);
+        if (n == 0) break;
+        for (read_buf[0..n]) |c| {
+            if (c == '\n') {
+                processLine(line_buf[0..line_len], &shells, &shell_lengths, &shellcnt, &numshells);
+                line_len = 0;
+            } else if (line_len < line_buf.len) {
+                line_buf[line_len] = c;
+                line_len += 1;
             }
         }
-
-        if (!found and numshells < MAX_SHELLS) {
-            @memcpy(shells[numshells][0..shell.len], shell);
-            shell_lengths[numshells] = shell.len;
-            shellcnt[numshells] = 1;
-            numshells += 1;
-        }
+    }
+    // Handle last line if file doesn't end with newline
+    if (line_len > 0) {
+        processLine(line_buf[0..line_len], &shells, &shell_lengths, &shellcnt, &numshells);
     }
 
-    var stdout_buf: [4096]u8 = undefined;
-    var stdout_writer: Io.File.Writer = .init(.stdout(), io, &stdout_buf);
-    const out = &stdout_writer.interface;
+    var out_buf: [4096]u8 = undefined;
+    var out_pos: usize = 0;
 
     for (0..numshells) |i| {
-        try out.print("{s:<18}:\t{d}\n", .{ shells[i][0..shell_lengths[i]], shellcnt[i] });
+        const shell_str = shells[i][0..shell_lengths[i]];
+        const line = std.fmt.bufPrint(out_buf[out_pos..], "{s:<18}:\t{d}\n", .{ shell_str, shellcnt[i] }) catch break;
+        out_pos += line.len;
     }
-    try out.flush();
+
+    var written: usize = 0;
+    while (written < out_pos) {
+        const rc = linux.write(posix.STDOUT_FILENO, out_buf[written..out_pos].ptr, out_pos - written);
+        const n = @as(isize, @bitCast(rc));
+        if (n < 0) return error.WriteError;
+        written += @intCast(n);
+    }
 }
