@@ -31,3 +31,5 @@ results*
 *target*
 # editor tooling
 .ccls-cache
+zig-out/
+.zig-cache/

@@ -150,7 +150,8 @@ do
 
 	time_sec=$(printf '%s\n' "$stats" | cut -d, -f1)
 	rss=$(printf '%s\n' "$stats" | cut -d, -f2)
-	loc=$(awk 'END { print NR }' "$source")
+	# shellcheck disable=SC2086
+	loc=$(awk 'END { print NR }' $source)
 
 	printf '%s,%s,%s,%s\n' \
 		"$name" \

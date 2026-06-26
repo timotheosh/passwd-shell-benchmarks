@@ -72,6 +72,20 @@ if [ -n "$CC" ]; then
 	register c "${BINDIR}/getshells-c" "${SRCDIR}/getshells.c"
 fi
 
+if command -v zig >/dev/null 2>&1; then
+	log BUILD Zig
+	(
+		cd "${SRCDIR}/getshells_zig"
+		zig build -Doptimize=ReleaseFast \
+			>"../../${LOGDIR}/zig.log" 2>&1
+	)
+
+	cp "${SRCDIR}/getshells_zig/zig-out/bin/getshells" \
+		"${BINDIR}/getshells-zig"
+
+	register zig "${BINDIR}/getshells-zig" "${SRCDIR}/getshells_zig/src/root.zig ${SRCDIR}/getshells_zig/src/main.zig"
+fi
+
 if command -v cargo >/dev/null 2>&1; then
 	log BUILD Rust
 	(
