@@ -34,6 +34,7 @@ To date, the following languages are represented:
  *  Ruby
  *  Rust
  *  Shell/awk
+ *  Zig
 
 If you're an expert in a language not listed here, we welcome your contribution!
 

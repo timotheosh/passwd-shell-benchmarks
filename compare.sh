@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eu
+#set -eu
 
 RUNS=${RUNS:-10}
 OUTFILE=${OUTFILE:-results.csv}
