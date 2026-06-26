@@ -1,13 +1,22 @@
+(require :sb-posix)
+
 (declaim (optimize (speed 3) (safety 0) (debug 0)
                    (compilation-speed 0)))
 
-;; --- portable libc SIMD bindings ----------------------------------------
+;; --- libc SIMD bindings ---------------------------------------------------
 ;;
 ;; memchr is POSIX and present on every target libc (glibc, musl, BSD libc,
-;; illumos libc). memrchr is a GNU extension absent on BSD/illumos, so we
-;; do NOT use it; instead we chain forward memchr calls to find the last
-;; colon, which keeps the scan single-direction and portable.
+;; illumos libc). memrchr is a GNU extension, present on glibc/Linux but
+;; absent on FreeBSD, OpenBSD, and illumos libc. We bind it conditionally:
+;; native memrchr on Linux (fastest path, single backward SIMD scan), and
+;; a portable forward-memchr-chain fallback everywhere else.
 (sb-alien:define-alien-routine ("memchr" %memchr) sb-alien:unsigned-long
+  (addr sb-alien:unsigned-long)
+  (c    sb-alien:int)
+  (n    sb-alien:size-t))
+
+#+linux
+(sb-alien:define-alien-routine ("memrchr" %memrchr) sb-alien:unsigned-long
   (addr sb-alien:unsigned-long)
   (c    sb-alien:int)
   (n    sb-alien:size-t))
@@ -50,11 +59,27 @@
                    (code-char (sb-sys:sap-ref-8 base (+ start i)))))
     s))
 
-;; Forward-chain memchr over [start, end) for byte CH, returning the LAST
-;; match position, or -1 if none found. This replaces memrchr with a
-;; sequence of forward scans — same direction as the newline scan, so no
-;; cache-pattern reversal, and portable to any POSIX memchr.
+;; Find the index of the last occurrence of CH in [start, end), or -1.
+;;
+;; #+linux: single native memrchr call (glibc SIMD backward scan).
+;; #-linux: forward memchr chain — keeps every scan in this program moving
+;;          in the same direction, and avoids depending on a GNU-only libc
+;;          extension that BSD/illumos libc don't provide.
+#+linux
 (declaim (inline last-index-of))
+#+linux
+(defun last-index-of (base start end ch)
+  (declare (type sb-vm:word base)
+           (fixnum start end)
+           (fixnum ch))
+  (let* ((len  (- end start))
+         (hit  (%memrchr (+ base start) ch len)))
+    (declare (fixnum len) (type sb-vm:word hit))
+    (if (zerop hit) -1 (the fixnum (- hit base)))))
+
+#-linux
+(declaim (inline last-index-of))
+#-linux
 (defun last-index-of (base start end ch)
   (declare (type sb-vm:word base)
            (fixnum start end)
@@ -95,8 +120,6 @@
                                  (the fixnum (- nl-addr base)))))
               (declare (fixnum nl-pos) (type sb-vm:word nl-addr))
 
-              ;; Single forward pass to find the last colon in this line —
-              ;; replaces the old backward memrchr scan.
               (let ((colon-pos (last-index-of base line-start nl-pos 58)))
                 (declare (fixnum colon-pos))
 
