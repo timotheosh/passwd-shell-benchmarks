@@ -1,10 +1,9 @@
 // getshells - core logic
 // Reads a unix passwd file and tallies login shells
-// Uses std.posix / std.os.linux for cross-version compatibility
+// Uses std.posix for cross-version compatibility
 // (tested on Zig 0.15.x and 0.17-dev)
 const std = @import("std");
 const posix = std.posix;
-const linux = std.os.linux;
 
 const MAX_SHELLS = 64;
 const SHELL_LEN = 64;
@@ -39,7 +38,7 @@ fn processLine(
 
 pub fn run() !void {
     const fd = try posix.openat(posix.AT.FDCWD, "passwd", .{ .ACCMODE = .RDONLY }, 0);
-    defer _ = linux.close(fd);
+    defer _ = posix.close(fd);
 
     var shells = std.mem.zeroes([MAX_SHELLS]ShellName);
     var shell_lengths = std.mem.zeroes([MAX_SHELLS]usize);
@@ -79,9 +78,6 @@ pub fn run() !void {
 
     var written: usize = 0;
     while (written < out_pos) {
-        const rc = linux.write(posix.STDOUT_FILENO, out_buf[written..out_pos].ptr, out_pos - written);
-        const n = @as(isize, @bitCast(rc));
-        if (n < 0) return error.WriteError;
-        written += @intCast(n);
+        written += try posix.write(posix.STDOUT_FILENO, out_buf[written..out_pos]);
     }
 }
