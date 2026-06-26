@@ -170,10 +170,6 @@ if command -v perl >/dev/null 2>&1; then
 	log WRAP Perl
 	make_wrapper getshells-pl perl getshells.pl
 	register perl "${BINDIR}/getshells-pl" "${SRCDIR}/getshells.pl"
-
-	log WRAP Perl-One-Liner
-	make_wrapper getshells-one-liner-pl sh getshells-one-liner.pl
-	register perl-one-liner "${BINDIR}/getshells-one-liner-pl" "${SRCDIR}/getshells-one-liner.pl"
 fi
 
 if command -v ruby >/dev/null 2>&1; then
