@@ -1,13 +1,10 @@
 // getshells - core logic
 // Reads a unix passwd file and tallies login shells
-// Uses libc for posix library compatiblitly
-// Tested on zig 0.16.0
+// Uses std.posix / std.os.linux for cross-version compatibility
+// (tested on Zig 0.15.x and 0.17-dev)
 const std = @import("std");
-
-const c = @cImport({
-    @cInclude("fcntl.h");
-    @cInclude("unistd.h");
-});
+const posix = std.posix;
+const linux = std.os.linux;
 
 const MAX_SHELLS = 64;
 const SHELL_LEN = 64;
@@ -41,10 +38,8 @@ fn processLine(
 }
 
 pub fn run() !void {
-    const fd = c.open("passwd", c.O_RDONLY);
-    if (fd < 0)
-        return error.OpenFailed;
-    defer _ = c.close(fd);
+    const fd = try posix.openat(posix.AT.FDCWD, "passwd", .{ .ACCMODE = .RDONLY }, 0);
+    defer _ = linux.close(fd);
 
     var shells = std.mem.zeroes([MAX_SHELLS]ShellName);
     var shell_lengths = std.mem.zeroes([MAX_SHELLS]usize);
@@ -56,16 +51,14 @@ pub fn run() !void {
     var line_len: usize = 0;
 
     while (true) {
-        const n = c.read(fd, &read_buf, read_buf.len);
-        if (n < 0)
-            return error.ReadFailed;
+        const n = try posix.read(fd, &read_buf);
         if (n == 0) break;
-        for (read_buf[0..@intCast(n)]) |ch| {
-            if (ch == '\n') {
+        for (read_buf[0..n]) |c| {
+            if (c == '\n') {
                 processLine(line_buf[0..line_len], &shells, &shell_lengths, &shellcnt, &numshells);
                 line_len = 0;
             } else if (line_len < line_buf.len) {
-                line_buf[line_len] = ch;
+                line_buf[line_len] = c;
                 line_len += 1;
             }
         }
@@ -86,15 +79,9 @@ pub fn run() !void {
 
     var written: usize = 0;
     while (written < out_pos) {
-        const n = c.write(
-            c.STDOUT_FILENO,
-            out_buf[written..out_pos].ptr,
-            out_pos - written,
-        );
-
-        if (n < 0)
-            return error.WriteFailed;
-
+        const rc = linux.write(posix.STDOUT_FILENO, out_buf[written..out_pos].ptr, out_pos - written);
+        const n = @as(isize, @bitCast(rc));
+        if (n < 0) return error.WriteError;
         written += @intCast(n);
     }
 }
