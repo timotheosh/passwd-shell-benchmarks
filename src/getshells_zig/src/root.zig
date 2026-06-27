@@ -105,6 +105,6 @@ pub fn run() !void {
 
     var written: usize = 0;
     while (written < out_pos) {
-        written += try xwrite(posix.STDOUT_FILENO, out_buf[written..]);
+        written += try xwrite(posix.STDOUT_FILENO, out_buf[written..out_pos]);
     }
 }
