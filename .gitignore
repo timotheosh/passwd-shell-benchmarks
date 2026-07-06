@@ -8,7 +8,6 @@ benchmark.list
 # compiler artifacts
 *.o
 *.hi
-*.scm.go
 a.out
 # temporary/generated files
 *.txt
@@ -16,20 +15,16 @@ a.out
 out*
 *.scm.go
 .ccls-cache
-a.out
 *~
 commit.txt
 getshells
 getshells-*
 getshells.hi
 getshells.o
-out*
 push-to-master
 pull-from-master
 release
-results*
 *target*
 # editor tooling
-.ccls-cache
 zig-out/
 .zig-cache/
