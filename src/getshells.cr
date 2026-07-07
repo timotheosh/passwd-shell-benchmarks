@@ -1,4 +1,4 @@
-#!/usr/bin/crystal run --release
+#!/usr/bin/env -S crystal run --release
 
 class ShellCounter
   getter counts = Hash(String, Int32).new(0)
