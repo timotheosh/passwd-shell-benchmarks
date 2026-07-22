@@ -1,7 +1,11 @@
 #!/bin/sh
+
 # run this after the binaries have been built.
 # verifies that the programs produce valid output
+
 set -eu
+
+[ -r benchmark.list ] || { echo "run build.sh first"; exit 1; }
 
 # Dynamically count the number of bash entries in the passwd file
 EXPECTED_COUNT=$(grep -c '/bash$' /etc/passwd)
@@ -13,14 +17,13 @@ do
     # skip if not executable
     [ -x "$prog" ] || continue
     
-    base=$(basename "$prog")
-    printf 'validating %s...\n' "$name"
+    printf 'validating %-20s... ' "$name"
     
     # run program and check if output matches the dynamic count
     if "$prog" | grep -q "$EXPECTED_COUNT"; then
-	printf '%-20s OK\n' "$base"
+	printf "OK\n"
     else
-        printf '%-20s FAILED\n' "$base"
+        printf "FAILED\n"
     fi
 done
 
