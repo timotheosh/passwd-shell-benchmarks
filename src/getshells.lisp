@@ -63,9 +63,11 @@
 ;; Find the index of the last occurrence of CH in [start, end), or -1.
 ;;
 ;; #+(or linux freebsd): single native memrchr call (SIMD backward scan).
-;; #-(or linux freebsd): forward memchr chain — keeps every scan in this
-;;   program moving in the same direction, and avoids depending on a libc
-;;   extension absent on OpenBSD/illumos.
+;; #+sunos: backward byte scan via sap-ref-8 — single O(n) pass with no
+;;   per-iteration FFI overhead; SBCL (speed 3) compiles the loop to a
+;;   tight register loop.  Faster than the forward chain on illumos whose
+;;   libc lacks memrchr.
+;; fallback: forward memchr chain for everything else (e.g. OpenBSD).
 #+(or linux freebsd)
 (declaim (inline last-index-of))
 #+(or linux freebsd)
@@ -78,9 +80,24 @@
     (declare (fixnum len) (type sb-vm:word hit))
     (if (zerop hit) -1 (the fixnum (- hit base)))))
 
-#-(or linux freebsd)
+#+sunos
 (declaim (inline last-index-of))
-#-(or linux freebsd)
+#+sunos
+(defun last-index-of (base start end ch)
+  (declare (type sb-vm:word base)
+           (fixnum start end)
+           (fixnum ch))
+  (let ((sap (sb-sys:int-sap base))
+        (i   (1- end)))
+    (declare (fixnum i))
+    (loop
+      (when (< i start) (return -1))
+      (when (= (sb-sys:sap-ref-8 sap i) ch) (return i))
+      (decf i))))
+
+#-(or linux freebsd sunos)
+(declaim (inline last-index-of))
+#-(or linux freebsd sunos)
 (defun last-index-of (base start end ch)
   (declare (type sb-vm:word base)
            (fixnum start end)
