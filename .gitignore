@@ -28,3 +28,4 @@ release
 # editor tooling
 zig-out/
 .zig-cache/
+.aider*
