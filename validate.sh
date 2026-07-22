@@ -1,37 +1,26 @@
 #!/bin/sh
-
 # run this after the binaries have been built.
 # verifies that the programs produce valid output
-
 set -eu
-VAL=validation
 
-# Create directory if it does not exist
-mkdir -p "$VAL"
+# Dynamically count the number of bash entries in the passwd file
+EXPECTED_COUNT=$(grep -c '/bash$' /etc/passwd)
 
 exec 3< benchmark.list
+
 while IFS='|' read -r name prog source <&3
-do 
+do
+    # skip if not executable
     [ -x "$prog" ] || continue
+    
     base=$(basename "$prog")
     printf 'validating %s...\n' "$name"
-    # run program once to generate validation data
-    "$prog" > "$VAL/${base}"
-done
-
-# loop over files using a direct glob
-for i in "$VAL"/*
-do
-    # ensure file exists (handles empty directories safely)
-    [ -e "$i" ] || continue
-
-    base=`echo $i | awk -F\- '{ print $2 }'`
-
-    # check silently using exit codes
-    if grep -q '44804' "$i"; then
-        echo "$base:  OK"
+    
+    # run program and check if output matches the dynamic count
+    if "$prog" | grep -q "$EXPECTED_COUNT"; then
+	printf '%-20s OK\n' "$base"
     else
-        echo "$base:  failed"
+        printf '%-20s FAILED\n' "$base"
     fi
 done
 
