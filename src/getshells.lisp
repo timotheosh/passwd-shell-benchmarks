@@ -6,16 +6,17 @@
 ;; --- libc SIMD bindings ---------------------------------------------------
 ;;
 ;; memchr is POSIX and present on every target libc (glibc, musl, BSD libc,
-;; illumos libc). memrchr is a GNU extension, present on glibc/Linux but
-;; absent on FreeBSD, OpenBSD, and illumos libc. We bind it conditionally:
-;; native memrchr on Linux (fastest path, single backward SIMD scan), and
-;; a portable forward-memchr-chain fallback everywhere else.
+;; illumos libc). memrchr is a GNU extension on Linux (glibc) but is also
+;; available on FreeBSD libc (added in FreeBSD 11). It is absent on OpenBSD
+;; and illumos libc. We bind it conditionally: native memrchr on Linux and
+;; FreeBSD (fastest path, single backward SIMD scan), and a portable
+;; forward-memchr-chain fallback everywhere else.
 (sb-alien:define-alien-routine ("memchr" %memchr) sb-alien:unsigned-long
   (addr sb-alien:unsigned-long)
   (c    sb-alien:int)
   (n    sb-alien:size-t))
 
-#+linux
+#+(or linux freebsd)
 (sb-alien:define-alien-routine ("memrchr" %memrchr) sb-alien:unsigned-long
   (addr sb-alien:unsigned-long)
   (c    sb-alien:int)
@@ -61,13 +62,13 @@
 
 ;; Find the index of the last occurrence of CH in [start, end), or -1.
 ;;
-;; #+linux: single native memrchr call (glibc SIMD backward scan).
-;; #-linux: forward memchr chain — keeps every scan in this program moving
-;;          in the same direction, and avoids depending on a GNU-only libc
-;;          extension that BSD/illumos libc don't provide.
-#+linux
+;; #+(or linux freebsd): single native memrchr call (SIMD backward scan).
+;; #-(or linux freebsd): forward memchr chain — keeps every scan in this
+;;   program moving in the same direction, and avoids depending on a libc
+;;   extension absent on OpenBSD/illumos.
+#+(or linux freebsd)
 (declaim (inline last-index-of))
-#+linux
+#+(or linux freebsd)
 (defun last-index-of (base start end ch)
   (declare (type sb-vm:word base)
            (fixnum start end)
@@ -77,9 +78,9 @@
     (declare (fixnum len) (type sb-vm:word hit))
     (if (zerop hit) -1 (the fixnum (- hit base)))))
 
-#-linux
+#-(or linux freebsd)
 (declaim (inline last-index-of))
-#-linux
+#-(or linux freebsd)
 (defun last-index-of (base start end ch)
   (declare (type sb-vm:word base)
            (fixnum start end)
