@@ -10,6 +10,7 @@ A few scripts are included:
 - `build.sh`: build or make wrapper scripts for the implementations
 - `compare.sh`: benchmark the built/wrapped implementations and export results to a csv
 - `cleanup.sh`: clean up build artifacts
+- `validate.sh`: verify whether all programs produce valid output
 
 To date, the following languages are represented:
 
