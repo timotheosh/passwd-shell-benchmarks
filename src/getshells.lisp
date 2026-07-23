@@ -30,34 +30,28 @@
   (advice sb-alien:int))
 
 (defconstant +madv-sequential+ 2)
+(defconstant +max-shells+ 64)
 
-;; -------------------------------------------------------------------------
+;; Compare two byte slices, both within the mmap'd SAP PTR.
+;; SBCL (speed 3) emits a tight native loop for short shell names (~10 bytes).
+(declaim (inline shells-equal-p))
+(defun shells-equal-p (ptr a-start b-start len)
+  (declare (type sb-sys:system-area-pointer ptr)
+           (fixnum a-start b-start len))
+  (loop for i fixnum from 0 below len
+        always (= (sb-sys:sap-ref-8 ptr (+ a-start i))
+                  (sb-sys:sap-ref-8 ptr (+ b-start i)))))
 
-(defstruct (shell-entry (:conc-name se-))
-  (name  ""  :type simple-string)
-  (count  0  :type fixnum))
-
-(declaim (inline match-shell))
-(defun match-shell (base sh-start sh-end name)
-  (declare (type sb-sys:system-area-pointer base)
-           (fixnum sh-start sh-end)
-           (simple-string name))
-  (let ((len (- sh-end sh-start)))
-    (declare (fixnum len))
-    (and (= len (length name))
-         (loop for i fixnum from 0 below len
-               always (= (sb-sys:sap-ref-8 base (+ sh-start i))
-                         (char-code (schar name i)))))))
-
-(defun materialize (base start end)
-  (declare (type sb-sys:system-area-pointer base)
-           (fixnum start end))
-  (let* ((len (- end start))
-         (s   (make-string len)))
-    (declare (fixnum len) (simple-string s))
+;; Materialize LEN bytes from the mmap'd region into a fresh Lisp string.
+;; Called only at output time (once per distinct shell, typically < 10 total).
+(defun materialize (ptr start len)
+  (declare (type sb-sys:system-area-pointer ptr)
+           (fixnum start len))
+  (let ((s (make-string len)))
+    (declare (simple-string s))
     (loop for i fixnum from 0 below len
           do (setf (schar s i)
-                   (code-char (sb-sys:sap-ref-8 base (+ start i)))))
+                   (code-char (sb-sys:sap-ref-8 ptr (+ start i)))))
     s))
 
 ;; Find the index of the last occurrence of CH in [start, end), or -1.
@@ -122,8 +116,20 @@
                                sb-posix:map-private
                                fd 0))
          (base  (sb-sys:sap-int ptr))
-         (shells '()))
-    (declare (fixnum size) (type sb-vm:word base))
+         ;; Flat simple-vector arrays (general element type): same cache layout
+         ;; as the C version with no pointer chasing through cons cells.
+         ;; We avoid (element-type 'fixnum) specialization: its upgrade rules
+         ;; differ across SBCL versions, producing wrong (safety 0) access code.
+         (shell-starts  (make-array +max-shells+ :initial-element 0))
+         (shell-lengths (make-array +max-shells+ :initial-element 0))
+         (shell-counts  (make-array +max-shells+ :initial-element 0))
+         (numshells 0)
+         ;; Output buffer: filled while the mapping is still alive, flushed
+         ;; after munmap, to avoid accessing ptr after unwind-protect cleanup.
+         (out   (make-array 512 :element-type 'character
+                                :fill-pointer 0
+                                :adjustable t)))
+    (declare (fixnum size numshells) (type sb-vm:word base))
     (%madvise base size +madv-sequential+)
 
     (unwind-protect
@@ -142,26 +148,40 @@
                 (declare (fixnum colon-pos))
 
                 (unless (= colon-pos -1)
-                  (let ((sh-start (1+ colon-pos)))
-                    (declare (fixnum sh-start))
-                    (when (< sh-start nl-pos)
+                  (let* ((sh-start (the fixnum (1+ colon-pos)))
+                         (sh-len   (the fixnum (- nl-pos sh-start))))
+                    (declare (fixnum sh-start sh-len))
+                    (when (> sh-len 0)
                       (let ((found nil))
-                        (dolist (e shells)
-                          (declare (type shell-entry e))
-                          (when (match-shell ptr sh-start nl-pos (se-name e))
-                            (incf (se-count e))
+                        (dotimes (k numshells)
+                          (when (and (= sh-len (the fixnum (svref shell-lengths k)))
+                                     (shells-equal-p ptr sh-start
+                                                     (the fixnum (svref shell-starts k))
+                                                     sh-len))
+                            (incf (the fixnum (svref shell-counts k)))
                             (setf found t)
                             (return)))
                         (unless found
-                          (push (make-shell-entry
-                                 :name  (materialize ptr sh-start nl-pos)
-                                 :count 1)
-                                shells)))))))
+                          (when (< numshells +max-shells+)
+                            (setf (svref shell-starts  numshells) sh-start
+                                  (svref shell-lengths numshells) sh-len
+                                  (svref shell-counts  numshells) 1)
+                            (incf numshells))))))))
 
-              (setf line-start (1+ nl-pos)))))
+              (setf line-start (the fixnum (1+ nl-pos)))))
+
+          ;; Materialize shell names while the mapping is still live.
+          (with-output-to-string (s out)
+            (dotimes (i numshells)
+              (write-string (materialize ptr
+                                         (the fixnum (svref shell-starts  i))
+                                         (the fixnum (svref shell-lengths i)))
+                            s)
+              (write-string " : " s)
+              (princ (svref shell-counts i) s)
+              (write-char #\Newline s))))
 
       (sb-posix:munmap ptr size)
       (sb-posix:close fd))
 
-    (dolist (e shells)
-      (format t "~A : ~D~%" (se-name e) (se-count e)))))
+    (write-string out)))
